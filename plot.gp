@@ -60,3 +60,16 @@ plot "conv_dt.dat" using 1:2 with linespoints title "Explicit L2", \
      "conv_dt.dat" using 1:5 with linespoints title "Implicit Linf", \
      "conv_dt.dat" using 1:6 with linespoints title "Crank-Nicolson L2", \
      "conv_dt.dat" using 1:7 with linespoints title "Crank-Nicolson Linf"
+
+# 5. 安定性の確認
+set output "stability.png"
+set title "Stability Test (dx = \pi/20, limit dt ~ 0.0123)"
+set xlabel "dt"
+set ylabel "Error Norm"
+unset logscale x
+set logscale y
+set format x "%g"
+set format y "10^{%L}"
+plot "stability.dat" using 1:2 with linespoints title "Explicit L2", \
+     "stability.dat" using 1:4 with linespoints title "Implicit L2", \
+     "stability.dat" using 1:6 with linespoints title "Crank-Nicolson L2"
