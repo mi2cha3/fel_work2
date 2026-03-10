@@ -1,9 +1,9 @@
 #include "../incs/diff_eq.h"
 
-extern double g_kappa;
+extern double	g_kappa;
 
-
-double crank_nicolson(double dt, double dx, double time, double *l_2, double *l_inf, FILE *fp_dist)
+double	crank_nicolson(double dt, double dx, double time, double *l_2,
+		double *l_inf, FILE *fp_dist)
 {
 	int t_steps = round(time / dt);
 	int x_steps = round(M_PI / dx);
@@ -30,7 +30,7 @@ double crank_nicolson(double dt, double dx, double time, double *l_2, double *l_
 
 		int iter = 0;
 		double max_error = 1.0;
-		double tolerance = 1e-6;
+		double tolerance = 1e-12;
 
 		while (max_error > tolerance && iter < 10000)
 		{
@@ -40,11 +40,13 @@ double crank_nicolson(double dt, double dx, double time, double *l_2, double *l_
 			{
 				double old_val = u[k + 1][i];
 
-			// ガウス・ザイデルの仮更新値
-				double b_i = (r / 2.0) * u[k][i - 1] + (1.0 - r) * u[k][i] + (r / 2.0) * u[k][i + 1];
-				double u_star = (b_i + (r / 2.0) * u[k + 1][i - 1] + (r / 2.0) * u[k + 1][i + 1]) / (1.0 + r);
+				// ガウス・ザイデルの仮更新値
+				double b_i = (r / 2.0) * u[k][i - 1] + (1.0 - r) * u[k][i] + (r
+						/ 2.0) * u[k][i + 1];
+				double u_star = (b_i + (r / 2.0) * u[k + 1][i - 1] + (r / 2.0)
+						* u[k + 1][i + 1]) / (1.0 + r);
 
-			// SOR法による実際の更新
+				// SOR法による実際の更新
 				u[k + 1][i] = (1.0 - omega) * old_val + omega * u_star;
 
 				double current_error = fabs(u[k + 1][i] - old_val);
@@ -58,11 +60,12 @@ double crank_nicolson(double dt, double dx, double time, double *l_2, double *l_
 	if (fp_dist)
 	{
 		for (int i = 0; i <= x_steps; i++)
-			fprintf(fp_dist, "%e %e %e\n", i * dx, u[t_steps][i], exact(time, i * dx));
+			fprintf(fp_dist, "%e %e %e\n", i * dx, u[t_steps][i], exact(time, i
+					* dx));
 		fprintf(fp_dist, "\n\n");
 	}
 
 	calc_diff(u, l_2, l_inf, t_steps, x_steps, dt, dx);
 	free_index(u, t_steps);
-	return 0.0;
+	return (0.0);
 }

@@ -18,9 +18,12 @@ void	run_distribution(void)
 	FILE	*fp_exp;
 	FILE	*fp_imp;
 	FILE	*fp_cn;
-	double	l2_exp = 0.0, linf_exp;
-	double	l2_imp = 0.0, linf_imp;
-	double	l2_cn = 0.0, linf_cn;
+	double	l2_exp;
+	double	linf_exp;
+	double	l2_imp;
+	double	linf_imp;
+	double	l2_cn;
+	double	linf_cn;
 
 	dt = 0.001;
 	dx = 0.1;
@@ -49,9 +52,12 @@ void	run_convergence_dx(void)
 	double	dx_list[] = {M_PI / 10, M_PI / 20, M_PI / 40, M_PI / 80};
 	int		n;
 	FILE	*fp;
-	double	l2_exp = 0.0, linf_exp;
-	double	l2_imp = 0.0, linf_imp;
-	double	l2_cn = 0.0, linf_cn;
+	double	l2_exp;
+	double	linf_exp;
+	double	l2_imp;
+	double	linf_imp;
+	double	l2_cn;
+	double	linf_cn;
 
 	time = 1.0;
 	dt = 0.00001;
@@ -77,25 +83,32 @@ void	run_convergence_dt(void)
 	double	dx;
 	int		n;
 	FILE	*fp;
-	double	l2_exp = 0.0, linf_exp;
-	double	l2_imp = 0.0, linf_imp;
-	double	l2_cn = 0.0, linf_cn;
+	double	l2_exp;
+	double	linf_exp;
+	double	l2_imp;
+	double	linf_imp;
+	double	l2_cn;
+	double	linf_cn;
+	double	r;
+	int		nx_list[] = {10, 20, 40, 80, 160};
+	double	dt;
 
 	time = 1.0;
-	dx = M_PI / 100;
-	double dt_list[] = {0.0004, 0.0002, 0.0001, 0.00005, 0.000025, 0.0000125};
-	n = 6;
+	r = 0.4;
+	n = 5;
 	fp = fopen("conv_dt.dat", "w");
 	for (int i = 0; i < n; i++)
 	{
+		dx = M_PI / nx_list[i];
+		dt = r * dx * dx / g_kappa;
 		l2_exp = 0.0, linf_exp = 0.0;
 		l2_imp = 0.0, linf_imp = 0.0;
 		l2_cn = 0.0, linf_cn = 0.0;
-		euler_explicit(dt_list[i], dx, time, &l2_exp, &linf_exp, NULL);
-		euler_implicit(dt_list[i], dx, time, &l2_imp, &linf_imp, NULL);
-		crank_nicolson(dt_list[i], dx, time, &l2_cn, &linf_cn, NULL);
-		fprintf(fp, "%e %e %e %e %e %e %e\n", dt_list[i], l2_exp, linf_exp,
-			l2_imp, linf_imp, l2_cn, linf_cn);
+		euler_explicit(dt, dx, time, &l2_exp, &linf_exp, NULL);
+		euler_implicit(dt, dx, time, &l2_imp, &linf_imp, NULL);
+		crank_nicolson(dt, dx, time, &l2_cn, &linf_cn, NULL);
+		fprintf(fp, "%e %e %e %e %e %e %e\n", dt, l2_exp, linf_exp, l2_imp,
+			linf_imp, l2_cn, linf_cn);
 	}
 	fclose(fp);
 }
@@ -105,13 +118,17 @@ void	stability_test(void)
 	double	time;
 	int		n;
 	FILE	*fp;
-	double	l2_exp = 0.0, linf_exp;
-	double	l2_imp = 0.0, linf_imp;
-	double	l2_cn = 0.0, linf_cn;
+	double	l2_exp;
+	double	linf_exp;
+	double	l2_imp;
+	double	linf_imp;
+	double	l2_cn;
+	double	linf_cn;
+	double	dx;
+	double	dt_list[] = {0.01, 0.012, 0.0123, 0.0126, 0.013, 0.015};
 
 	time = 5.0;
-	double dx = M_PI / 20;                                         
-	double dt_list[] = {0.01, 0.012, 0.0123, 0.0126, 0.013, 0.015};
+	dx = M_PI / 20;
 	n = 6;
 	fp = fopen("stability.dat", "w");
 	printf("--- Stability Test (dx = M_PI/20, limit dt ~ 0.0123) ---\n");

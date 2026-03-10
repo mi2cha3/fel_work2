@@ -1,6 +1,6 @@
 NAME = diff_eq
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror -O3
 LFLAGS = -lm
 
 INC_DIR = incs

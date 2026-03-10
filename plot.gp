@@ -1,4 +1,5 @@
-set terminal pngcairo size 1200,800 font "Arial,12"
+set terminal pngcairo size 1200,800 font "Arial,18"
+set pointsize 2
 
 # 1. 空間分布のプロット (Explicit)
 set output "dist_explicit.png"
@@ -7,6 +8,9 @@ set xlabel "x"
 set ylabel "u(x,t)"
 set grid
 unset logscale
+set key top right
+set xrange [0:pi]
+set xtics ("0" 0, "{/Symbol p}/4" pi/4, "{/Symbol p}/2" pi/2, "3{/Symbol p}/4" 3*pi/4, "{/Symbol p}" pi)
 plot "dist_explicit.dat" index 0 using 1:2 with lines title "t=0.0", \
      "dist_explicit.dat" index 1 using 1:2 with lines title "t=0.1", \
      "dist_explicit.dat" index 2 using 1:2 with lines title "t=0.5", \
@@ -16,6 +20,9 @@ plot "dist_explicit.dat" index 0 using 1:2 with lines title "t=0.0", \
 # 2. 空間分布のプロット (Implicit)
 set output "dist_implicit.png"
 set title "Temperature Distribution (Implicit)"
+set key top right
+set xrange [0:pi]
+set xtics ("0" 0, "{/Symbol p}/4" pi/4, "{/Symbol p}/2" pi/2, "3{/Symbol p}/4" 3*pi/4, "{/Symbol p}" pi)
 plot "dist_implicit.dat" index 0 using 1:2 with lines title "t=0.0", \
      "dist_implicit.dat" index 1 using 1:2 with lines title "t=0.1", \
      "dist_implicit.dat" index 2 using 1:2 with lines title "t=0.5", \
@@ -25,6 +32,9 @@ plot "dist_implicit.dat" index 0 using 1:2 with lines title "t=0.0", \
 # 2.5 空間分布のプロット (Crank-Nicolson)
 set output "dist_crank_nicolson.png"
 set title "Temperature Distribution (Crank-Nicolson)"
+set key top right
+set xrange [0:pi]
+set xtics ("0" 0, "{/Symbol p}/4" pi/4, "{/Symbol p}/2" pi/2, "3{/Symbol p}/4" 3*pi/4, "{/Symbol p}" pi)
 plot "dist_crank_nicolson.dat" index 0 using 1:2 with lines title "t=0.0", \
      "dist_crank_nicolson.dat" index 1 using 1:2 with lines title "t=0.1", \
      "dist_crank_nicolson.dat" index 2 using 1:2 with lines title "t=0.5", \
@@ -37,8 +47,11 @@ set title "Grid Convergence (Spatial: dx)"
 set xlabel "dx"
 set ylabel "Error Norm"
 set logscale xy
+unset xrange
 set format x "10^{%L}"
 set format y "10^{%L}"
+set xtics auto
+set key bottom right
 plot "conv_dx.dat" using 1:2 with linespoints title "Explicit L2", \
      "conv_dx.dat" using 1:3 with linespoints title "Explicit Linf", \
      "conv_dx.dat" using 1:4 with linespoints title "Implicit L2", \
@@ -46,20 +59,24 @@ plot "conv_dx.dat" using 1:2 with linespoints title "Explicit L2", \
      "conv_dx.dat" using 1:6 with linespoints title "Crank-Nicolson L2", \
      "conv_dx.dat" using 1:7 with linespoints title "Crank-Nicolson Linf"
 
-# 4. 時間刻み(dt)のコンバージェンス
+# 4. 時間刻み(dt)のコンバージェンス (結合細分化 r=0.4)
 set output "conv_dt.png"
-set title "Grid Convergence (Temporal: dt)"
+set title "Grid Convergence (Temporal: dt, coupled refinement r=0.4)"
 set xlabel "dt"
 set ylabel "Error Norm"
 set logscale xy
+set xtics auto
 set format x "10^{%L}"
 set format y "10^{%L}"
+set key bottom right
+f_odt(x) = 0.5 * x
 plot "conv_dt.dat" using 1:2 with linespoints title "Explicit L2", \
      "conv_dt.dat" using 1:3 with linespoints title "Explicit Linf", \
      "conv_dt.dat" using 1:4 with linespoints title "Implicit L2", \
      "conv_dt.dat" using 1:5 with linespoints title "Implicit Linf", \
      "conv_dt.dat" using 1:6 with linespoints title "Crank-Nicolson L2", \
-     "conv_dt.dat" using 1:7 with linespoints title "Crank-Nicolson Linf"
+     "conv_dt.dat" using 1:7 with linespoints title "Crank-Nicolson Linf", \
+     f_odt(x) dt 2 lc rgb "gray" title "O({/Symbol D}t)"
 
 # 5. 安定性の確認
 set output "stability.png"
@@ -70,6 +87,14 @@ unset logscale x
 set logscale y
 set format x "%g"
 set format y "10^{%L}"
+set key top left
+dt_limit = (pi/20.0)**2 / 2.0
+set arrow 1 from dt_limit, graph 0 to dt_limit, graph 1 nohead dt 3 lc rgb "red" lw 2
+set xtics 0.001
+set label 1 sprintf("dt_{limit}=%.4f", dt_limit) at dt_limit, graph 0.85 offset 1,0 tc rgb "red" font "Arial,14"
 plot "stability.dat" using 1:2 with linespoints title "Explicit L2", \
      "stability.dat" using 1:4 with linespoints title "Implicit L2", \
      "stability.dat" using 1:6 with linespoints title "Crank-Nicolson L2"
+unset arrow 1
+unset label 1
+set xtics auto
